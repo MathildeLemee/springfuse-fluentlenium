@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"	
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:composite="http://java.sun.com/jsf/composite">
+
+<head>
+	<title>Displays error messages in an accessible fashion.</title>
+</head>
+<body>
+	<composite:interface>
+	</composite:interface>
+
+	<composite:implementation>
+		<div id="#{cc.clientId}">
+			<c:if test="${messagesHelper.hasGlobalMessages()}">
+				<ul>
+					<c:forEach var="item" items="${messagesHelper.getGlobalMessages()}" varStatus="status">
+					<li><span class="${item.facesMessage.severity}">${item.facesMessage.summary}</span></li>
+					</c:forEach>
+				</ul>
+			</c:if>
+			<c:if test="${messagesHelper.hasNonGlobalMessages()}">
+				<p>
+					<h:outputFormat value="#{msg.error_present}" >
+			    		<f:param value="${messagesHelper.nonGlobalMessagesCount()}"/>
+					</h:outputFormat>
+				</p>
+				
+				<ul>
+					<c:forEach var="item" items="${messagesHelper.getNonGlobalMessages()}" varStatus="status">
+					<li><a id="errorMsgNo${status.index}" href="javascript:void" onclick="APP.focusTo('${item.sourceId}'); return false;">${item.facesMessage.summary}</a></li>
+					</c:forEach>
+				</ul>
+				<script type="text/javascript">
+					$(function() {
+						setTimeout(function() {
+							APP.focusTo('errorMsgNo0')
+						}, 500);
+					});
+				</script>
+			</c:if>			
+		</div>
+	</composite:implementation>
+</body>
+</html>

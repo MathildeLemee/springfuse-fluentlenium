@@ -1,0 +1,21 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<!-- Display commandButton for 'send', 'save' or 'ok' action depending on the context -->
+
+	<p:commandButton id="save" action="save" ajax="true" update="messages" process="@form"
+		styleClass="aria-save-button default"
+		image="ui-icon-disk"
+		value="#{msg.menu_save}"
+		rendered="#{not sub and not readonly}" />
+
+	<p:commandButton id="send" action="send" ajax="true" update="messages" process="@form"
+		styleClass="aria-save-button"
+		value="#{msg.menu_send}"
+		rendered="#{not sub and not readonly}" />
+
+   	<p:commandButton id="ok" action="ok" process="@form" ajax="true" update="messages" 
+   		styleClass="default" value="${msg.submit}" image="ui-icon-check" rendered="#{sub and not readonly}" />
+	
+</ui:composition>

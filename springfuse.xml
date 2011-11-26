@@ -1,0 +1,137 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.yourcompany.yourproject</groupId>
+	<artifactId>myproject</artifactId>
+	<version>1.0.0</version>
+	<name>myproject</name>
+	<properties>
+		<!-- specify how we can access the database to reverse (here an embedded H2 database) -->
+		<database.name>${project.artifactId}-${project.version}</database.name>
+		<jdbc.groupId>com.h2database</jdbc.groupId>
+		<jdbc.artifactId>h2</jdbc.artifactId>
+		<jdbc.version>1.2.131</jdbc.version>
+		<jdbc.type>h2</jdbc.type>
+		<jdbc.driver>org.h2.Driver</jdbc.driver>
+		<jdbc.url>jdbc:h2:~/.h2/${database.name}</jdbc.url>
+		<jdbc.user>${database.name}</jdbc.user>
+		<jdbc.password>${database.name}</jdbc.password>
+        <!-- uncomment and configure if needed 
+        <jdbc.catalog></jdbc.catalog>
+        <jdbc.schema></jdbc.schema>
+        -->
+		<sql-maven-plugin.delimiter>;</sql-maven-plugin.delimiter>
+
+		<!-- Which kind of front end should springfuse generate ? -->
+		<maven-remote-generation-plugin.frontEnd>jsf2Primefaces</maven-remote-generation-plugin.frontEnd>
+
+		<!-- Required only if you are behind an http proxy -->
+		<maven-remote-generation-plugin.proxy.enable>false</maven-remote-generation-plugin.proxy.enable>
+		<maven-remote-generation-plugin.proxy.host>yourproxyhost</maven-remote-generation-plugin.proxy.host>
+		<maven-remote-generation-plugin.proxy.port>8080</maven-remote-generation-plugin.proxy.port>
+		<maven-remote-generation-plugin.proxy.username>yourproxyusername</maven-remote-generation-plugin.proxy.username>
+		<maven-remote-generation-plugin.proxy.password>yourproxypassword</maven-remote-generation-plugin.proxy.password>
+		<!-- If your proxy is using NTML... -->
+		<maven-remote-generation-plugin.proxy.ntlm.enable>false</maven-remote-generation-plugin.proxy.ntlm.enable>
+		<maven-remote-generation-plugin.proxy.ntlm.domain>yourdomain</maven-remote-generation-plugin.proxy.ntlm.domain>
+		<maven-remote-generation-plugin.proxy.ntlm.workstation>yourcomputername</maven-remote-generation-plugin.proxy.ntlm.workstation>
+        
+        <!-- When provided, we send you generation logs + extracted metadata... -->        
+        <maven-remote-generation-plugin.email>n/a</maven-remote-generation-plugin.email>        
+	</properties>
+	<build>
+		<defaultGoal>generate-sources</defaultGoal>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>1.0</version>
+				<executions>
+					<execution>
+						<id>enforce-versions</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>2.0.6</version>
+								</requireMavenVersion>
+								<requireJavaVersion>
+									<version>1.6</version>
+								</requireJavaVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>sql-maven-plugin</artifactId>
+				<version>1.4</version>
+				<configuration>
+					<driver>${jdbc.driver}</driver>
+					<url>${jdbc.url}</url>
+					<username>${jdbc.user}</username>
+					<password>${jdbc.password}</password>
+					<autocommit>true</autocommit>
+					<encoding>UTF-8</encoding>
+				</configuration>
+				<executions>
+					<execution>
+						<id>Create and initialize the database</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>execute</goal>
+						</goals>
+						<configuration>
+							<autocommit>true</autocommit>
+							<print>true</print>
+							<onError>continue</onError>
+							<delimiter>${sql-maven-plugin.delimiter}</delimiter>
+							<orderFile>ascending</orderFile>
+							<fileset>
+								<basedir>${basedir}</basedir>
+								<includes>
+									<include>src/main/sql/${jdbc.type}/*.sql</include>
+								</includes>
+							</fileset>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>${jdbc.groupId}</groupId>
+						<artifactId>${jdbc.artifactId}</artifactId>
+						<version>${jdbc.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
+				<groupId>com.springfuse</groupId>
+				<artifactId>maven-springfuse-plugin</artifactId>
+				<version>3.0.66</version>
+				<executions>
+					<execution>
+						<id>extract metadata from given database.</id>
+						<goals>
+							<goal>remote-generation</goal>
+						</goals>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>${jdbc.groupId}</groupId>
+						<artifactId>${jdbc.artifactId}</artifactId>
+						<version>${jdbc.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>springfuse-repository</id>
+			<url>http://maven2.springfuse.com</url>
+		</pluginRepository>
+	</pluginRepositories>
+</project>
