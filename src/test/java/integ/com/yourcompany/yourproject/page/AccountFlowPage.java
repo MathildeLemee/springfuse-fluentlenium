@@ -3,6 +3,7 @@ package integ.com.yourcompany.yourproject.page;
 
 import com.google.common.base.Function;
 import fr.javafreelance.fluentlenium.core.FluentPage;
+import integ.com.yourcompany.yourproject.Config;
 import org.apache.commons.lang.StringUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -14,9 +15,11 @@ import static org.fest.assertions.Assertions.assertThat;
 
 public class AccountFlowPage extends FluentPage {
 
+    private static final int TIME_OUT_IN_SECONDS = 5;
+
     @Override
     public String getUrl() {
-        return "http://localhost:8080/myproject/app/account?mode=embedded";    //To change body of overridden methods use File | Settings | File Templates.
+        return Config.getUrl()+"/app/account?mode=embedded";    //To change body of overridden methods use File | Settings | File Templates.
     }
 
     @Override
@@ -25,7 +28,8 @@ public class AccountFlowPage extends FluentPage {
     }
 
     public String getNbResult() {
-       this.setWait(new WebDriverWait(getDriver(),5));
+       this.setWait(new WebDriverWait(getDriver(), TIME_OUT_IN_SECONDS));
+
        Function ajaxSearchChangeResults =  new Function<WebDriver, Boolean>() {
            @Override
            public Boolean apply(@Nullable WebDriver webDriver) {
