@@ -1,22 +1,18 @@
 package integ.com.yourcompany.yourproject;
 
-import static org.fest.assertions.Assertions.assertThat;
-import integ.com.yourcompany.yourproject.page.AccessDeniedPage;
-import integ.com.yourcompany.yourproject.page.AccountFlowPage;
-import integ.com.yourcompany.yourproject.page.LoginPage;
-
-import org.junit.Test;
-
 import fr.javafreelance.fluentlenium.core.annotation.Page;
 import fr.javafreelance.fluentlenium.core.test.FluentTest;
+import integ.com.yourcompany.yourproject.page.AccountFlowPage;
+import integ.com.yourcompany.yourproject.page.LoginPage;
+import org.junit.Test;
+
+import static org.fest.assertions.Assertions.assertThat;
 
 public class AccountSearchTest extends FluentTest {
     @Page
     LoginPage loginPage;
     @Page
     AccountFlowPage accountFlowPage;
-    @Page
-    AccessDeniedPage accessDeniedPage;
 
     @Test
     public void as_an_admin_I_can_search_by_name() {
@@ -57,7 +53,6 @@ public class AccountSearchTest extends FluentTest {
         assertThat(accountFlowPage.getNbResults()).isEqualTo(50);
         assertThat(accountFlowPage.hasText("admin@example.com")).isTrue();
         assertThat(accountFlowPage.hasText("user11@example.com")).isFalse();
-
         accountFlowPage.nextPage();
         assertThat(accountFlowPage.getNbResults()).isEqualTo(50);
         assertThat(accountFlowPage.hasText("admin@example.com")).isFalse();

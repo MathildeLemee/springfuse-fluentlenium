@@ -1,27 +1,21 @@
 package integ.com.yourcompany.yourproject.page;
 
+import com.google.common.base.Function;
+import fr.javafreelance.fluentlenium.core.FluentPage;
+import fr.javafreelance.fluentlenium.core.domain.FluentWebElement;
+import integ.com.yourcompany.yourproject.Config;
+import org.openqa.selenium.WebDriver;
+
+import javax.annotation.Nullable;
+import java.util.concurrent.TimeUnit;
+
 import static fr.javafreelance.fluentlenium.core.filter.FilterConstructor.withId;
 import static fr.javafreelance.fluentlenium.core.filter.FilterConstructor.withText;
 import static fr.javafreelance.fluentlenium.core.filter.MatcherConstructor.contains;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import static org.fest.assertions.Assertions.assertThat;
-import integ.com.yourcompany.yourproject.Config;
-
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nullable;
-
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import com.google.common.base.Function;
-
-import fr.javafreelance.fluentlenium.core.FluentPage;
-import fr.javafreelance.fluentlenium.core.domain.FluentWebElement;
 
 public class AccountFlowPage extends FluentPage {
-    private static final int TIMEOUT_IN_SECONDS = 1;
 
     public AccountFlowPage() {
     }
@@ -44,18 +38,11 @@ public class AccountFlowPage extends FluentPage {
         return findFirst("#searchResultsRegion");
     }
 
-    private void setupWait() {
-        if (getWait() == null) {
-            setWait(new WebDriverWait(getDriver(), TIMEOUT_IN_SECONDS));
-        }
-    }
 
     public int getNbResults() {
-        setupWait();
-        getWait().until(new Function<WebDriver, Boolean>() {
+        await().atMost(5, TimeUnit.SECONDS).until(new Function<WebDriver, Boolean>() {
             @Override
             public synchronized Boolean apply(@Nullable WebDriver webDriver) {
-                sleepOneSecond();
                 return isNotEmpty(searchRegion().getText());
             }
 
@@ -68,37 +55,29 @@ public class AccountFlowPage extends FluentPage {
     }
 
     public boolean hasText(String text) {
-        return !find("*", withText(contains(text))).isEmpty();
+        return this.pageSource().contains(text);
     }
 
     public FluentWebElement paginatorCurrent() {
-        return findFirst("span.ui-paginator-current");
+        return findFirst("tbody",withId().endsWith("searchResults_data")).findFirst("tr");
     }
 
-    public void sleepOneSecond() {
-        try {
-            long i = new Date().getTime();
-            System.out.println();
-            TimeUnit.SECONDS.sleep(1);
-            System.out.println("slept for " + (new Date().getTime() - i));
-        } catch (InterruptedException ignore) {
-        }
-    }
 
     public void nextPage() {
         String currentPaginator = paginatorCurrent().getText();
         click("span.ui-icon-seek-next");
         System.out.println("Clicked on next");
-        setupWait();
-        getWait().until(new PaginationAvailable(currentPaginator));
+        await().until(new PaginationAvailable(currentPaginator));
+        //await().atMost(5, TimeUnit.SECONDS).ignoring(NoSuchElementException.class).until("tr").withId().contains("searchResults_r_10").isPresent(); ;
+
     }
 
     public void previousPage() {
         String currentPaginator = paginatorCurrent().getText();
         click("span.ui-icon-seek-prev");
         System.out.println("Clicked on prev");
-        setupWait();
-        getWait().until(new PaginationAvailable(currentPaginator));
+        await().until(new PaginationAvailable(currentPaginator));
+        //await().atMost(5, TimeUnit.SECONDS).ignoring(NoSuchElementException.class).until("tr").withId().endsWith("searchResults_r_1").isPresent(); ;
     }
 
     public void fillEmail(String value) {
@@ -130,7 +109,6 @@ public class AccountFlowPage extends FluentPage {
 
         @Override
         public synchronized Boolean apply(@Nullable WebDriver webDriver) {
-            sleepOneSecond();
             return !oldPaginator.equalsIgnoreCase(paginatorCurrent().getText());
         }
     }
