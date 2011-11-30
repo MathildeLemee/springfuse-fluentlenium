@@ -1,16 +1,15 @@
 package integ.com.yourcompany.yourproject.page;
 
-
-import fr.javafreelance.fluentlenium.core.FluentPage;
-import integ.com.yourcompany.yourproject.Config;
-
+import static fr.javafreelance.fluentlenium.core.filter.FilterConstructor.withId;
+import static fr.javafreelance.fluentlenium.core.filter.MatcherConstructor.contains;
 import static org.fest.assertions.Assertions.assertThat;
+import integ.com.yourcompany.yourproject.Config;
+import fr.javafreelance.fluentlenium.core.FluentPage;
 
 public class LoginPage extends FluentPage {
-
     @Override
     public String getUrl() {
-        return Config.getUrl()+"/app/login";    //To change body of overridden methods use File | Settings | File Templates.
+        return Config.getUrl() + "/app/login?locale=en";
     }
 
     @Override
@@ -18,20 +17,18 @@ public class LoginPage extends FluentPage {
         assertThat(find("span.ui-panel-title").getTexts()).contains("Login");
     }
 
-    public void loginAsUser() {
+    public void loginAs(String user, String password) {
         go();
-        fill("#j_username").with("user");
-        fill("#j_password").with("user");
+        fill("input", withId(contains("username"))).with(user);
+        fill("input", withId(contains("password"))).with(password);
         click("input[name='submit']");
+    }
+
+    public void loginAsUser() {
+        loginAs("user", "user");
     }
 
     public void loginAsAdmin() {
-        go();
-        fill("#j_username").with("admin");
-        fill("#j_password").with("admin");
-        click("input[name='submit']");
+        loginAs("admin", "admin");
     }
-
-
-
 }
