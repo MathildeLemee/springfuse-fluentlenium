@@ -1,38 +1,36 @@
 package integ.com.yourcompany.yourproject;
 
-
+import static org.fest.assertions.Assertions.assertThat;
+import static org.fest.assertions.fluentlenium.FluentLeniumAssertions.assertThat;
+import integ.com.yourcompany.yourproject.page.HomePage;
 import integ.com.yourcompany.yourproject.page.LoginPage;
-import fr.javafreelance.fluentlenium.core.annotation.Page;
-import fr.javafreelance.fluentlenium.core.test.FluentTest;
+
 import org.junit.Test;
 
-import static fr.javafreelance.fluentlenium.core.filter.FilterConstructor.withText;
-import static fr.javafreelance.fluentlenium.core.filter.MatcherConstructor.contains;
-import static fr.javafreelance.fluentlenium.core.filter.MatcherConstructor.startsWith;
-import static org.fest.assertions.Assertions.assertThat;
+import fr.javafreelance.fluentlenium.core.annotation.Page;
+import fr.javafreelance.fluentlenium.core.test.FluentTest;
 
-/**
- * use page to encapsulate general actions
- */
 public class LogoutTest extends FluentTest {
-
     @Page
     LoginPage loginPage;
-
+    @Page
+    HomePage homePage;
 
     @Test
-    public void as_an_user_I_can_log_out() {
+    public void as_a_user_I_can_log_out() {
         loginPage.loginAsUser();
-        click(".userInfo-user");
-        assertThat(find("p", withText(contains("Congrats user")))).hasSize(0);
+        assertThat(homePage).isAt();
+        homePage.clickLogout();
+        assertThat(homePage.hasText("Congrats user")).isFalse();
+        assertThat(homePage.hasText("Connexion")).isTrue();
     }
 
     @Test
     public void as_an_admin_I_can_log_out() {
         loginPage.loginAsAdmin();
-        click(".userInfo-user");
-        assertThat(find("p", withText(startsWith("Congrats")))).isEmpty();
+        assertThat(homePage).isAt();
+        homePage.clickLogout();
+        assertThat(homePage.hasText("Congrats admin")).isFalse();
+        assertThat(homePage.hasText("Connexion")).isTrue();
     }
-
-
 }
